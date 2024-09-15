@@ -1,0 +1,29 @@
+body {
+    font-family: Arial, sans-serif;
+}
+
+.gantt-chart {
+    display: flex;
+    justify-content: center;
+    margin: 20px auto;
+}
+
+.gantt-bar {
+    border: 2px solid red;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 10px;
+    margin-right: 2px;
+    background-color: lightyellow;
+}
+
+.gantt-time {
+    margin-right: 10px;
+    font-weight: bold;
+}
+
+/* Điều chỉnh khoảng cách giữa các nút và input */
+.form-row > label {
+    white-space: nowrap;
+}

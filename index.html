@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lập Lịch CPU - FCFS và SJF</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <div class="modal fade" id="profileModal" tabindex="-1" aria-labelledby="profileModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="profileModalLabel">Thông tin người làm</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+                </div>
+                <div class="modal-body">
+                    <p><strong>Tên</strong>: Phạm Đức Hòa</p>
+                    <p><strong>Mã sinh viên</strong>: 705105042</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <h1 class="text-center my-4">
+            Lập Lịch CPU - FCFS và SJF
+            <button type="button" class="btn btn-primary btn-sm ms-3" data-bs-toggle="modal"
+                data-bs-target="#profileModal">
+                Người làm
+            </button>
+            <button type="button" class="btn btn-info btn-sm ms-3" data-bs-toggle="modal"
+                data-bs-target="#descriptionModal">
+                ?
+            </button>
+        </h1>
+
+        <ul class="nav nav-tabs">
+            <li class="nav-item">
+                <a class="nav-link active" aria-current="page" href="#fcfs" data-bs-toggle="tab">FCFS</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#sjf" data-bs-toggle="tab">SJF</a>
+            </li>
+        </ul>
+
+        <div class="tab-content mt-4">
+            <!-- Tab FCFS -->
+            <div class="tab-pane fade show active" id="fcfs">
+                <h2 class="text-center">Thuật toán FCFS</h2>
+                <form id="fcfsForm">
+                    <div id="fcfsProcesses" class="mb-3">
+                        <div class="fcfs-process form-row d-inline-flex align-items-center mb-2">
+                            <label for="arrivalTime" class="me-2">Thời điểm đến:</label>
+                            <input type="number" class="arrivalTime form-control me-2" required>
+                            <label for="burstTime" class="me-2">Thời gian bùng nổ:</label>
+                            <input type="number" class="burstTime form-control me-2" required>
+                            <button type="button" class="btn btn-danger" onclick="removeProcess(this)">Xóa</button>
+                        </div>
+                    </div>
+                    <button type="button" class="btn btn-primary" onclick="addProcess('fcfs')">Thêm tiến trình</button>
+                    <button type="submit" class="btn btn-success">Tính toán</button>
+                </form>
+
+                <h2 class="text-center mt-4">Biểu đồ Gantt</h2>
+                <div id="fcfsGanttChart" class="gantt-chart mb-4"></div>
+
+                <h2 class="text-center">Bảng tiến trình</h2>
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Tiến trình</th>
+                            <th>Thời điểm đến</th>
+                            <th>Thời gian bùng nổ</th>
+                            <th>Thời gian hoàn thành</th>
+                            <th>Thời gian quay vòng</th>
+                            <th>Thời gian chờ</th>
+                        </tr>
+                    </thead>
+                    <tbody id="fcfsTable"></tbody>
+                </table>
+            </div>
+
+            <!-- Tab SJF -->
+            <div class="tab-pane fade" id="sjf">
+                <h2 class="text-center">Thuật toán SJF</h2>
+                <form id="sjfForm">
+                    <div id="sjfProcesses" class="mb-3">
+                        <div class="sjf-process form-row d-inline-flex align-items-center mb-2">
+                            <label for="arrivalTime" class="me-2">Thời điểm đến:</label>
+                            <input type="number" class="arrivalTime form-control me-2" required>
+                            <label for="burstTime" class="me-2">Thời gian bùng nổ:</label>
+                            <input type="number" class="burstTime form-control me-2" required>
+                            <button type="button" class="btn btn-danger" onclick="removeProcess(this)">Xóa</button>
+                        </div>
+                    </div>
+                    <button type="button" class="btn btn-primary" onclick="addProcess('sjf')">Thêm tiến trình</button>
+                    <button type="submit" class="btn btn-success">Tính toán</button>
+                </form>
+
+                <h2 class="text-center mt-4">Biểu đồ Gantt</h2>
+                <div id="sjfGanttChart" class="gantt-chart mb-4"></div>
+
+                <h2 class="text-center">Bảng tiến trình</h2>
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Tiến trình</th>
+                            <th>Thời điểm đến</th>
+                            <th>Thời gian bùng nổ</th>
+                            <th>Thời gian hoàn thành</th>
+                            <th>Thời gian quay vòng</th>
+                            <th>Thời gian chờ</th>
+                        </tr>
+                    </thead>
+                    <tbody id="sjfTable"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal mô tả thuật toán -->
+    <div class="modal fade" id="descriptionModal" tabindex="-1" aria-labelledby="descriptionModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="descriptionModalLabel">Mô tả Thuật Toán</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+                </div>
+                <div class="modal-body">
+                    <h6>Thuật toán FCFS (First-Come, First-Served)</h6>
+                    <p>
+                        FCFS là một thuật toán lập lịch CPU đơn giản nhất, trong đó các tiến trình được xử lý theo thứ
+                        tự chúng đến. Tiến trình đầu tiên đến sẽ được thực thi trước, và các tiến trình sau sẽ được xếp
+                        hàng đợi theo thứ tự đến.
+                    </p>
+                    <h6>Thuật toán SJF (Shortest Job First)</h6>
+                    <p>
+                        SJF là một thuật toán lập lịch CPU trong đó tiến trình có thời gian bùng nổ ngắn nhất sẽ được ưu
+                        tiên thực thi trước. Thuật toán này có thể giảm thời gian chờ trung bình của các tiến trình
+                        nhưng có thể gây ra vấn đề starvation đối với các tiến trình có thời gian bùng nổ dài.
+                    </p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="script.js"></script>
+</body>
+
+</html>
