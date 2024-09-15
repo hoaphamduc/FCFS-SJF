@@ -1,5 +1,12 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
 body {
     font-family: Arial, sans-serif;
+    height: 100vh;
 }
 
 .gantt-chart {
@@ -26,4 +33,13 @@ body {
 /* Điều chỉnh khoảng cách giữa các nút và input */
 .form-row > label {
     white-space: nowrap;
+}
+
+#source-code {
+    position: fixed;
+    z-index: 999;
+    background-color: #fff;
+    right: 0;
+    top: 0;
+    padding: 5px 20px;
 }
