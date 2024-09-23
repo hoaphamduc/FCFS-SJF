@@ -57,7 +57,8 @@ function processForm(type) {
         processes.sort((a, b) => a.burstTime - b.burstTime);
     }
 
-    let currentTime = 0;
+    let currentTime = processes[0].arrivalTime; // Start at the first process's arrival time
+    let totalWaitTime = 0;
 
     // Tính toán thời gian hoàn thành, quay vòng và chờ đợi cho mỗi tiến trình
     processes.forEach((process) => {
@@ -67,8 +68,19 @@ function processForm(type) {
         process.completionTime = currentTime + process.burstTime;
         process.turnaroundTime = process.completionTime - process.arrivalTime;
         process.waitingTime = process.turnaroundTime - process.burstTime;
+        totalWaitTime += process.waitingTime; // Cộng thời gian chờ của từng tiến trình
         currentTime = process.completionTime;
     });
+
+    // Tính toán thời gian chờ trung bình
+    let avgWaitTime = totalWaitTime / processes.length;
+
+    // Hiển thị thời gian chờ trung bình
+    if (type === 'fcfs') {
+        document.getElementById('fcfsAvgWaitTime').innerText = `Thời gian chờ trung bình: ${avgWaitTime.toFixed(2)} ms`;
+    } else if (type === 'sjf') {
+        document.getElementById('sjfAvgWaitTime').innerText = `Thời gian chờ trung bình: ${avgWaitTime.toFixed(2)} ms`;
+    }
 
     // Hiển thị biểu đồ Gantt và bảng tiến trình
     displayGanttChart(type, processes);
@@ -79,7 +91,7 @@ function processForm(type) {
 function displayGanttChart(type, processes) {
     const ganttChart = document.getElementById(type + 'GanttChart');
     ganttChart.innerHTML = '';
-    let currentTime = 0;
+    let currentTime = processes[0].arrivalTime; // Start Gantt chart from first arrival time
 
     // Duyệt qua các tiến trình để tạo biểu đồ Gantt
     processes.forEach(process => {
