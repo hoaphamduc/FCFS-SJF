@@ -2,12 +2,14 @@
 document.getElementById('fcfsForm').addEventListener('submit', function (e) {
     e.preventDefault();
     processForm('fcfs');
+    processTimeTable('fcfs'); // Gọi thêm hàm hiển thị bảng thời gian chi tiết
 });
 
 // Bắt sự kiện khi submit form SJF
 document.getElementById('sjfForm').addEventListener('submit', function (e) {
     e.preventDefault();
     processForm('sjf');
+    processSJFNonPreemptive();
 });
 
 // Hàm thêm tiến trình mới cho cả FCFS và SJF
@@ -28,6 +30,175 @@ function addProcess(type) {
 // Hàm xóa tiến trình
 function removeProcess(button) {
     button.parentElement.remove();
+}
+
+function processTimeTable(type) {
+    const processes = [];
+    const arrivalTimes = document.querySelectorAll(`#${type}Processes .arrivalTime`);
+    const burstTimes = document.querySelectorAll(`#${type}Processes .burstTime`);
+
+    for (let i = 0; i < arrivalTimes.length; i++) {
+        processes.push({
+            id: `P${i + 1}`,
+            arrivalTime: parseInt(arrivalTimes[i].value),
+            burstTime: parseInt(burstTimes[i].value),
+            remainingBurstTime: parseInt(burstTimes[i].value) // Thời gian chạy còn lại
+        });
+    }
+
+    // FCFS xử lý theo thời gian đến
+    if (type === 'fcfs') {
+        processes.sort((a, b) => a.arrivalTime - b.arrivalTime);
+    }
+
+    let currentTime = 0;
+    const detailedTimeTable = [];
+    let runningProcessIndex = -1;
+
+    while (processes.some(p => p.remainingBurstTime > 0)) {
+        const row = { time: currentTime, processes: Array(processes.length).fill('') };
+
+        // Hiển thị burst time của tất cả các tiến trình nhưng không highlight
+        processes.forEach((process, index) => {
+            if (process.arrivalTime <= currentTime && process.remainingBurstTime > 0) {
+                row.processes[index] = process.remainingBurstTime; // Hiển thị burst time nhưng không highlight
+            }
+        });
+
+        // Tìm tiến trình đang chạy
+        if (runningProcessIndex === -1 || processes[runningProcessIndex].remainingBurstTime === 0) {
+            runningProcessIndex = processes.findIndex(
+                process => process.arrivalTime <= currentTime && process.remainingBurstTime > 0
+            );
+        }
+
+        // Chỉ highlight tiến trình đang thực sự chạy
+        if (runningProcessIndex !== -1 && processes[runningProcessIndex].remainingBurstTime > 0) {
+            row.processes[runningProcessIndex] = processes[runningProcessIndex].remainingBurstTime; // Hiển thị burst time
+            processes[runningProcessIndex].remainingBurstTime--; // Giảm burst time
+        }
+
+        // Đảm bảo rằng chỉ có một ô được highlight
+        row.processes = row.processes.map((p, index) => {
+            if (index === runningProcessIndex) {
+                return `<td style="background-color: yellow;">${p}</td>`;
+            } else if (p !== '') {
+                return `<td>${p}</td>`;
+            } else {
+                return `<td></td>`;
+            }
+        });
+
+        detailedTimeTable.push(row);
+        currentTime++;
+    }
+
+    // Gọi hàm hiển thị bảng thời gian chi tiết
+    displayTimeTable(detailedTimeTable, processes);
+}
+
+// Hiển thị bảng thời gian chi tiết
+function displayTimeTable(detailedTimeTable, processes) {
+    const table = document.getElementById('timeTable');
+    table.innerHTML = '';
+
+    const headerRow = document.createElement('tr');
+    headerRow.innerHTML = `<th>Thời gian</th>` + processes.map(p => `<th>${p.id}</th>`).join('');
+    table.appendChild(headerRow);
+
+    detailedTimeTable.forEach(row => {
+        const rowElement = document.createElement('tr');
+        rowElement.innerHTML = `<td>${row.time}</td>` + row.processes.join('');
+        table.appendChild(rowElement);
+    });
+}
+
+function processSJFNonPreemptive() {
+    const processes = [];
+    const arrivalTimes = document.querySelectorAll(`#sjfProcesses .arrivalTime`);
+    const burstTimes = document.querySelectorAll(`#sjfProcesses .burstTime`);
+
+    for (let i = 0; i < arrivalTimes.length; i++) {
+        processes.push({
+            id: `P${i + 1}`,
+            arrivalTime: parseInt(arrivalTimes[i].value),
+            burstTime: parseInt(burstTimes[i].value),
+            remainingBurstTime: parseInt(burstTimes[i].value),
+            isCompleted: false,
+            completionTime: 0,
+            startTime: -1,
+        });
+    }
+
+    let currentTime = 0;
+    let completedProcesses = 0;
+    const totalProcesses = processes.length;
+    const detailedTimeTable = [];
+
+    while (completedProcesses < totalProcesses) {
+        let shortestProcessIndex = -1;
+        let minBurstTime = Infinity;
+
+        for (let i = 0; i < totalProcesses; i++) {
+            if (
+                processes[i].arrivalTime <= currentTime &&
+                !processes[i].isCompleted &&
+                processes[i].remainingBurstTime > 0
+            ) {
+                if (processes[i].remainingBurstTime < minBurstTime) {
+                    minBurstTime = processes[i].remainingBurstTime;
+                    shortestProcessIndex = i;
+                }
+            }
+        }
+
+        if (shortestProcessIndex === -1) {
+            currentTime++;
+            continue;
+        }
+
+        const row = { time: currentTime, processes: Array(totalProcesses).fill('') };
+        const runningProcess = processes[shortestProcessIndex];
+
+        if (runningProcess.startTime === -1) {
+            runningProcess.startTime = currentTime;
+        }
+
+        row.processes[shortestProcessIndex] = `<td style="background-color: yellow;">${runningProcess.remainingBurstTime}</td>`;
+        runningProcess.remainingBurstTime--;
+
+        if (runningProcess.remainingBurstTime === 0) {
+            runningProcess.isCompleted = true;
+            runningProcess.completionTime = currentTime + 1;
+            completedProcesses++;
+        }
+
+        processes.forEach((process, index) => {
+            if (process.arrivalTime <= currentTime && !process.isCompleted && row.processes[index] === '') {
+                row.processes[index] = `<td>${process.remainingBurstTime}</td>`;
+            }
+        });
+
+        detailedTimeTable.push(row);
+        currentTime++;
+    }
+
+    displayTimeTableForSJF(detailedTimeTable, processes);
+}
+
+function displayTimeTableForSJF(detailedTimeTable, processes) {
+    const table = document.getElementById('sjfTimeTable');
+    table.innerHTML = '';
+
+    const headerRow = document.createElement('tr');
+    headerRow.innerHTML = `<th>Thời gian</th>` + processes.map(p => `<th>${p.id}</th>`).join('');
+    table.appendChild(headerRow);
+
+    detailedTimeTable.forEach(row => {
+        const rowElement = document.createElement('tr');
+        rowElement.innerHTML = `<td>${row.time}</td>` + row.processes.join('');
+        table.appendChild(rowElement);
+    });
 }
 
 // Hàm xử lý form để tính toán các giá trị liên quan đến tiến trình
@@ -57,7 +228,7 @@ function processForm(type) {
         processes.sort((a, b) => a.burstTime - b.burstTime);
     }
 
-    let currentTime = processes[0].arrivalTime; // Start at the first process's arrival time
+    let currentTime = processes[0].arrivalTime;
     let totalWaitTime = 0;
 
     // Tính toán thời gian hoàn thành, quay vòng và chờ đợi cho mỗi tiến trình
