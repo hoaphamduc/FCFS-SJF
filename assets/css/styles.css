@@ -30,16 +30,16 @@ body {
     font-weight: bold;
 }
 
-/* Điều chỉnh khoảng cách giữa các nút và input */
 .form-row > label {
     white-space: nowrap;
 }
 
 #source-code {
-    position: fixed;
-    z-index: 999;
+    position: relative;
     background-color: #fff;
-    right: 0;
-    top: 0;
     padding: 5px 20px;
+    display: block;
+    margin-top: 20px;
+    width: 100%;
+    text-align: center;
 }
