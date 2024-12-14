@@ -43,3 +43,11 @@ body {
     width: 100%;
     text-align: center;
 }
+
+table th, table td {
+    text-align: center;
+}
+
+table th:first-child, table td:first-child {
+    text-align: left;
+}

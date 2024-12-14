@@ -8,7 +8,12 @@ document.getElementById('fcfsForm').addEventListener('submit', function (e) {
 // Bắt sự kiện khi submit form SJF
 document.getElementById('sjfForm').addEventListener('submit', function (e) {
     e.preventDefault();
-    processSJFNonPreemptive();
+    const mode = document.querySelector('input[name="sjfMode"]:checked').value;
+    if (mode === 'preemptive') {
+        processSJFPreemptive();
+    } else {
+        processSJFNonPreemptive();
+    }
 });
 
 // Hàm thêm tiến trình mới cho cả FCFS và SJF
@@ -110,6 +115,117 @@ function displayTimeTable(detailedTimeTable, processes) {
         rowElement.innerHTML = `<td>${row.time}</td>` + row.processes.join('');
         table.appendChild(rowElement);
     });
+}
+
+function processSJFPreemptive() {
+    const processes = [];
+    const arrivalTimes = document.querySelectorAll(`#sjfProcesses .arrivalTime`);
+    const burstTimes = document.querySelectorAll(`#sjfProcesses .burstTime`);
+
+    for (let i = 0; i < arrivalTimes.length; i++) {
+        processes.push({
+            id: `P${i + 1}`,
+            arrivalTime: parseInt(arrivalTimes[i].value),
+            burstTime: parseInt(burstTimes[i].value),
+            remainingTime: parseInt(burstTimes[i].value),
+            completionTime: 0,
+            turnaroundTime: 0,
+            waitingTime: 0,
+            isCompleted: false,
+        });
+    }
+
+    let currentTime = 0;
+    let completedProcesses = 0;
+    const totalProcesses = processes.length;
+    let totalWaitTime = 0;
+    const executionOrder = [];
+    const detailedTimeTable = [];
+    let lastProcess = null;
+
+    while (completedProcesses < totalProcesses) {
+        // Tìm tiến trình có thời gian còn lại ngắn nhất đã đến
+        let shortestProcessIndex = -1;
+        let minRemainingTime = Infinity;
+
+        for (let i = 0; i < totalProcesses; i++) {
+            if (
+                processes[i].arrivalTime <= currentTime &&
+                !processes[i].isCompleted &&
+                processes[i].remainingTime < minRemainingTime
+            ) {
+                minRemainingTime = processes[i].remainingTime;
+                shortestProcessIndex = i;
+            }
+        }
+
+        if (shortestProcessIndex === -1) {
+            // Không có tiến trình sẵn sàng, CPU nhàn rỗi
+            detailedTimeTable.push({
+                time: currentTime,
+                processes: Array(totalProcesses).fill('')
+            });
+            currentTime++;
+            continue;
+        }
+
+        const currentProcess = processes[shortestProcessIndex];
+
+        // Nếu tiến trình hiện tại khác tiến trình trước đó, ghi nhận sự chuyển đổi
+        if (lastProcess !== currentProcess.id) {
+            executionOrder.push({
+                id: currentProcess.id,
+                startTime: currentTime
+            });
+        }
+
+        // Giảm thời gian còn lại của tiến trình đang chạy
+        currentProcess.remainingTime--;
+
+        // Ghi lại trạng thái của tất cả các tiến trình
+        const row = { time: currentTime, processes: Array(totalProcesses).fill('') };
+        processes.forEach((process, index) => {
+            if (process.arrivalTime <= currentTime && !process.isCompleted) {
+                if (index === shortestProcessIndex) {
+                    // Tiến trình đang chạy
+                    row.processes[index] = `<td style="background-color: yellow;">${process.remainingTime}</td>`;
+                } else {
+                    // Tiến trình đang chờ
+                    row.processes[index] = `${process.remainingTime}`;
+                }
+            }
+        });
+        detailedTimeTable.push(row);
+
+        // Kiểm tra nếu tiến trình đã hoàn thành
+        if (currentProcess.remainingTime === 0) {
+            currentProcess.completionTime = currentTime + 1;
+            currentProcess.turnaroundTime = currentProcess.completionTime - currentProcess.arrivalTime;
+            currentProcess.waitingTime = currentProcess.turnaroundTime - currentProcess.burstTime;
+            totalWaitTime += currentProcess.waitingTime;
+            currentProcess.isCompleted = true;
+            completedProcesses++;
+
+            // Cập nhật thời gian kết thúc trong danh sách thực thi
+            executionOrder[executionOrder.length - 1].endTime = currentTime + 1;
+        }
+
+        currentTime++;
+        lastProcess = currentProcess.id;
+    }
+
+    // Tính thời gian chờ trung bình
+    let avgWaitTime = totalWaitTime / totalProcesses;
+    document.getElementById('sjfAvgWaitTime').innerText = `Thời gian chờ trung bình: ${avgWaitTime.toFixed(2)} ms`;
+
+    // Hiển thị bảng tiến trình
+    displayProcessTable('sjf', processes);
+
+    // Hiển thị biểu đồ Gantt sử dụng danh sách thực thi
+    displayGanttChart('sjf', executionOrder);
+
+    // Hiển thị bảng thời gian chạy chi tiết
+    displayTimeTableForSJF(detailedTimeTable, processes);
 }
 
 function processSJFNonPreemptive() {

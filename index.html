@@ -109,6 +109,17 @@
             <div class="tab-pane fade" id="sjf">
                 <h2 class="text-center">Thuật toán SJF</h2>
                 <form id="sjfForm">
+                    <div class="mb-3">
+                        <label class="me-2">Chế độ SJF:</label>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="sjfMode" id="preemptive" value="preemptive" checked>
+                            <label class="form-check-label" for="preemptive">Không Độc Quyền (Preemptive)</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="sjfMode" id="nonPreemptive" value="nonPreemptive">
+                            <label class="form-check-label" for="nonPreemptive">Độc Quyền (Non-Preemptive)</label>
+                        </div>
+                    </div>
                     <div id="sjfProcesses" class="mb-3">
                         <div class="sjf-process form-row d-inline-flex align-items-center mb-2">
                             <label for="arrivalTime" class="me-2">Thời điểm đến:</label>
