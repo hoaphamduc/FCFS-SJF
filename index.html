@@ -11,35 +11,10 @@
 </head>
 
 <body>
-    <div class="modal fade" id="profileModal" tabindex="-1" aria-labelledby="profileModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="profileModalLabel">Thông tin người làm</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
-                </div>
-                <div class="modal-body">
-                    <p><strong>Tên</strong>: Phạm Đức Hòa</p>
-                    <p><strong>Mã sinh viên</strong>: 705105042</p>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
-                </div>
-            </div>
-        </div>
-    </div>
 
     <div class="container">
         <h1 class="text-center my-4">
             Lập Lịch CPU - FCFS và SJF
-            <button type="button" class="btn btn-primary btn-sm ms-3" data-bs-toggle="modal"
-                data-bs-target="#profileModal">
-                Người làm
-            </button>
-            <button type="button" class="btn btn-info btn-sm ms-3" data-bs-toggle="modal"
-                data-bs-target="#descriptionModal">
-                ?
-            </button>
         </h1>
 
         <ul class="nav nav-tabs">
@@ -170,43 +145,6 @@
                 <p id="sjfAvgWaitTime" class="text-center mt-3"></p>
             </div>
         </div>
-    </div>
-
-    <!-- Modal mô tả thuật toán -->
-    <div class="modal fade" id="descriptionModal" tabindex="-1" aria-labelledby="descriptionModalLabel"
-        aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="descriptionModalLabel">Mô tả Thuật Toán</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
-                </div>
-                <div class="modal-body">
-                    <h6><b>Thuật toán FCFS (First-Come, First-Served)</b></h6>
-                    <p>
-                        FCFS là một thuật toán lập lịch CPU đơn giản nhất, trong đó các tiến trình được xử lý theo thứ
-                        tự chúng đến. Tiến trình đầu tiên đến sẽ được thực thi trước, và các tiến trình sau sẽ được xếp
-                        hàng đợi theo thứ tự đến.
-                    </p>
-                    <h6><b>Thuật toán SJF không độc quyền (Non-preemptive Shortest Job First)</b></h6>
-                    <p>
-                        SJF không độc quyền là một thuật toán lập lịch CPU trong đó tiến trình có thời gian bùng nổ ngắn
-                        nhất sẽ được ưu tiên thực thi trước. Khi một tiến trình bắt đầu thực thi, nó sẽ không bị gián
-                        đoạn cho đến khi hoàn thành, ngay cả khi có tiến trình mới đến với thời gian bùng nổ ngắn hơn.
-                        Thuật toán này có thể giảm thời gian chờ trung bình của các tiến trình nhưng có thể gây ra vấn
-                        đề <em>starvation</em> đối với các tiến trình có thời gian bùng nổ dài.
-                    </p>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div id="source-code">
-        Source code:
-        <a href="https://github.com/hoaphamduc/FCFS-SJF" target="_blank">Github</a>
     </div>
 
     <script src="assets/bootstrap/bs5.js"></script>

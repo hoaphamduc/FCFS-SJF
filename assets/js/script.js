@@ -179,8 +179,6 @@ function processSJFPreemptive() {
             });
         }
 
-        // Giảm thời gian còn lại của tiến trình đang chạy
-        currentProcess.remainingTime--;
 
         // Ghi lại trạng thái của tất cả các tiến trình
         const row = { time: currentTime, processes: Array(totalProcesses).fill('') };
@@ -195,6 +193,10 @@ function processSJFPreemptive() {
                 }
             }
         });
+
+        // Giảm thời gian còn lại của tiến trình đang chạy
+        currentProcess.remainingTime--;
+        
         detailedTimeTable.push(row);
 
         // Kiểm tra nếu tiến trình đã hoàn thành
